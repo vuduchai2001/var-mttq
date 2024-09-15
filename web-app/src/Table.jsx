@@ -9,6 +9,7 @@ import { Column } from "primereact/column";
 import { Calendar } from "primereact/calendar";
 
 function Table() {
+  const [records, setRecords] = useState([]);
   const [data, setData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -33,34 +34,8 @@ function Table() {
   });
 
   const fetchData = async (event = lazyState) => {
-    const files = [
-      "./data_part_1.json",
-      "./data_part_2.json",
-      "./data_part_3.json",
-      "./data_part_4.json",
-      "./data_part_5.json",
-      "./data_part_6.json",
-      "./data_part_7.json",
-      "./data_part_8.json",
-      "./data_part_9.json",
-      "./data_part_10.json",
-      "./data_part_11.json",
-      "./data_part_12.json",
-      "./data_part_13.json",
-      "./data_part_14.json",
-      "./data_part_15.json",
-      "./data_part_16.json",
-      "./data_part_17.json",
-      "./data_part_18.json",
-      "./data_part_19.json",
-      "./data_part_20.json",
-      "./data_part_21.json",
-    ];
     setLoading(true);
-    const responses = await Promise.all(files.map((file) => fetch(file)));
-    const allData = await Promise.all(responses.map((res) => res.json()));
-
-    let filteredData = allData.flatMap((data) => data);
+    let filteredData = data;
 
     if (event.filters) {
       if (event.filters.date_time?.constraints[0].value) {
@@ -185,12 +160,49 @@ function Table() {
 
     const pageData = filteredData.slice(event.first, event.first + event.rows);
     setLoading(false);
-    setData(pageData);
+    setRecords(pageData);
     setTotalRecords(filteredData.length);
   };
 
+  const fetchAsyncData = async (event = lazyState) => {
+    const files = [
+      "./data_part_1.json",
+      "./data_part_2.json",
+      "./data_part_3.json",
+      "./data_part_4.json",
+      "./data_part_5.json",
+      "./data_part_6.json",
+      "./data_part_7.json",
+      "./data_part_8.json",
+      "./data_part_9.json",
+      "./data_part_10.json",
+      "./data_part_11.json",
+      "./data_part_12.json",
+      "./data_part_13.json",
+      "./data_part_14.json",
+      "./data_part_15.json",
+      "./data_part_16.json",
+      "./data_part_17.json",
+      "./data_part_18.json",
+      "./data_part_19.json",
+      "./data_part_20.json",
+      "./data_part_21.json",
+    ];
+    setLoading(true);
+    const responses = await Promise.all(files.map((file) => fetch(file)));
+    const allData = await Promise.all(responses.map((res) => res.json()));
+
+    let filteredData = allData.flatMap((data) => data);
+    const pageData = filteredData.slice(event.first, event.first + event.rows);
+    setRecords(pageData);
+    setData(filteredData);
+    setTotalRecords(filteredData.length);
+    setLoading(false);
+    return filteredData;
+  };
+
   useEffect(() => {
-    fetchData();
+    fetchAsyncData();
   }, []);
 
   function parseDate(dateString) {
@@ -264,13 +276,13 @@ function Table() {
         <p style={{ textAlign: "right" }}>Tổng số giao dịch: {totalRecords}</p>
       )}
       <DataTable
-        value={data}
+        value={records}
         lazy
         paginator
         rows={lazyState.rows}
         totalRecords={totalRecords}
-        loading={loading}
         first={lazyState.first}
+        loading={loading}
         onPage={onPage}
         tableStyle={{ minWidth: "60rem" }}
         stripedRows
