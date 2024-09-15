@@ -22,7 +22,7 @@ const processChunk = (chunk, startIndex) => {
 
   // Write to JSON file
   fs.writeFileSync(
-    `data/data_part_${fileCount + 1}.json`,
+    `data/vietcombank/data_part_${fileCount + 1}.json`,
     JSON.stringify(jsonData, null, 2),
     "utf8"
   );
